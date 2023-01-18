@@ -25,29 +25,30 @@ refs.loadMoreBtn.addEventListener('click', fetchCarts);
 
 
 
-function onSeacrh(evt) {
+async function onSeacrh(evt) {
     evt.preventDefault();
-
+    
     if (!evt.currentTarget.elements.searchQuery.value.trim()) {
         return  Notify.failure("Sorry, there are no images matching your search query. Please try again.")
     }
-
+    
     clearGallery();
 
     newsApiService.query = evt.currentTarget.elements.searchQuery.value.trim();
     newsApiService.resetPage();
-    fetchCarts(); 
-   
+    await fetchCarts(); 
+    notificationTotalHits();  
 }
 
-function fetchCarts() {
-    hideBtn();
-    newsApiService.fetchCarts()
-        .then(hits => {
-          appendCartsOfGallery(hits)
-          showBtn()
-        })
-        .catch(err => Notify.failure("Sorry, there are no images matching your search query. Please try again."));
+async function fetchCarts() {
+  try{
+      hideBtn();
+      const hits = await newsApiService.fetchCarts();
+      console.log(hits);          
+      appendCartsOfGallery(hits);
+      showBtn();
+  } 
+    catch(err) {Notify.failure("Sorry, there are no images matching your search query. Please try again.")};
 
       
             
@@ -114,3 +115,7 @@ function clearGallery() {
 let gallery = new SimpleLightbox('.gallery__link', {
   captionDelay: 250,
 });
+
+function notificationTotalHits() {
+  Notify.success(`Hooray! We found ${newsApiService.totalHits} images.`)
+}

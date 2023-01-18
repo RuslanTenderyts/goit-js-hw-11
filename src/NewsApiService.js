@@ -7,6 +7,7 @@ export default class NewsApiService {
     this.page = 1;
     this.perPage = 10;
     this.totalPages = 0;
+    this.totalHits = 0;
   }
 
   async fetchCarts() {
@@ -30,7 +31,8 @@ export default class NewsApiService {
           if (!totalHits) {
             throw new Error(response.statusText);
           }
-          this.totalPages = Math.floor(totalHits / this.perPage);
+          this.totalHits = totalHits;
+          this.totalPages = Math.floor(this.totalHits / this.perPage);
           this.page += 1;
     return hits;
    
