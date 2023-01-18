@@ -82,7 +82,7 @@ function createMarkupOfCart(hits) {
           class="gallery__image"
           src="${webformatURL}" 
           alt="${tags}" 
-          title="${tags}" />
+          loading="lazy" />
         </a>
         <div class="info">
           <p class="info-item">
@@ -99,7 +99,7 @@ function createMarkupOfCart(hits) {
           </p>
         </div>
       </div>`).join('');
-
+    
     return markup;
 }
 
@@ -112,10 +112,39 @@ function clearGallery() {
 }
 
 
-let gallery = new SimpleLightbox('.gallery__link', {
+let gallery = new SimpleLightbox('.photo-card a', {
   captionDelay: 250,
 });
 
 function notificationTotalHits() {
   Notify.success(`Hooray! We found ${newsApiService.totalHits} images.`)
+}
+
+function checkPosition() {
+  const height = document.body.offsetHeight
+  const screenHeight = window.innerHeight
+  const scrolled = window.scrollY
+  const threshold = height - screenHeight / 4
+  const position = scrolled + screenHeight
+  if (position >= threshold) {
+    fetchCarts();
+  }
+}
+;(() => {
+  window.addEventListener('scroll', throttle(checkPosition, 250))
+  window.addEventListener('resize', throttle(checkPosition, 250))
+})()
+function throttle(callee, timeout) {
+  let timer = null
+
+  return function perform(...args) {
+    if (timer) return
+
+    timer = setTimeout(() => {
+      callee(...args)
+
+      clearTimeout(timer)
+      timer = null
+    }, timeout)
+  }
 }
